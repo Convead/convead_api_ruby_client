@@ -7,10 +7,7 @@ module Convead
       def self.errors
         @errors ||= {
           400 => Convead::Error::BadRequest,
-          401 => Convead::Error::Unauthorized,
           404 => Convead::Error::ResourceNotFound,
-          405 => Convead::Error::InvalidMethodType,
-          415 => Convead::Error::UnsupportedMediaType,
           500 => Convead::Error::InternalServerError,
           502 => Convead::Error::BadGateway,
           503 => Convead::Error::ServiceUnavailable,
@@ -29,13 +26,7 @@ module Convead
 
     class BadRequest < ClientError; end
 
-    class Unauthorized < ClientError; end
-
     class ResourceNotFound < ClientError; end
-
-    class InvalidMethodType < ClientError; end
-
-    class UnsupportedMediaType < ClientError; end
 
     class ServerError < APIError; end
 
