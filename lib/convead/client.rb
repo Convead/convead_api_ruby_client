@@ -56,29 +56,25 @@ module Convead
       end
 
       def send_event(type, properties, visitor_info)
+        url = "#{protocol}://#{domain}#{properties[:path]}"
         params = {
           app_key:      app_key,
           type:         type,
-          visitor_info: visitor_info     
+          domain:       domain,
+          host:         domain,
+          url:          url,
+          visitor_info: visitor_info
         }
         ROOT_EVENT_PROPERTIES.each do |property_name|
           params[property_name] = properties.delete(property_name)
         end
         params[:properties] = properties
-        
-        headers = {
-          'Referer' => URI.join(root_url, params[:path]).to_s
-        }
 
-        connection.post('/watch/event', params, headers)
+        connection.post('/watch/event', params)
       end
 
       def protocol
         options[:ssl] ? 'https' : 'http'
-      end
-
-      def root_url
-        @root_url ||= "#{protocol}://#{domain}"
       end
 
       def api_root_url
