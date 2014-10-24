@@ -9,12 +9,16 @@ module Convead
   class Client
 
     API_HOST = 'tracker.convead.io'
-    EVENT_TYPES = [:link, :mailto, :file, :purchase].freeze
+    EVENT_TYPES = [:link, :mailto, :file, :purchase, :view_product, :add_to_cart, :remove_from_cart, :update_cart].freeze
     ROOT_EVENT_PROPERTIES = [:visitor_uid, :guest_uid, :flow_uid, :url, :domain, :host, :path, :title, :referrer].freeze
     REQUIRED_EVENT_PROPERTIES = {
-      mailto:   [:email].freeze,
-      file:     [:file_url].freeze,
-      purchase: [:order_id, :revenue].freeze
+      mailto:           [:email].freeze,
+      file:             [:file_url].freeze,
+      view_product:     [:product_id].freeze,
+      add_to_cart:      [:product_id, :qnt].freeze,
+      remove_from_cart: [:product_id, :qnt].freeze,
+      update_cart:      [:items].freeze,
+      purchase:         [:order_id, :revenue].freeze
     }
 
     attr_reader :app_key, :domain, :options
