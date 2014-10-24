@@ -9,14 +9,14 @@ module Convead
   class Client
 
     API_HOST = 'tracker.convead.io'
-    EVENT_TYPES = [:link, :mailto, :file, :purchase, :view, :submit, :close].freeze
-    ROOT_EVENT_PROPERTIES = [:visitor_uid, :guest_uid, :flow_uid, :path, :title, :revenue , :order_id, :items, :widget_id, :referrer, :key_page_id].freeze
+    EVENT_TYPES = [:link, :mailto, :file, :purchase].freeze
+    ROOT_EVENT_PROPERTIES = [:visitor_uid, :guest_uid, :flow_uid, :url, :domain, :host, :path, :title, :referrer].freeze
     REQUIRED_EVENT_PROPERTIES = {
-      general: [:path].freeze,
-      mailto:  [:email].freeze,
-      file:    [:file_url].freeze
+      mailto:   [:email].freeze,
+      file:     [:file_url].freeze,
+      purchase: [:order_id, :revenue].freeze
     }
-    
+
     attr_reader :app_key, :domain, :options
 
     def initialize(app_key, domain, options = {})
@@ -26,50 +26,47 @@ module Convead
       @options[:adapter] ||= :net_http   
     end
 
-    def event(type, properties, visitor_info = {})
+    def event(type, root_params = {}, properties = {}, visitor_info = {}, attributes = {})
       type = type.to_sym
       properties.symbolize_keys!
       visitor_info.symbolize_keys!
+      attributes.symbolize_keys!
 
-      validate_event(type, properties, visitor_info)
-      send_event(type, properties, visitor_info)
+      validate_event(type, root_params, properties, visitor_info, attributes)
+      send_event(type, root_params, properties, visitor_info, attributes)
     end
 
     private
 
-      def validate_event(type, properties, visitor_info)
+      def validate_event(type, root_params, properties, visitor_info, attributes)
         if !EVENT_TYPES.include?(type)
           raise ArgumentError.new("Unkown event #{type}")
         end
-        if (properties[:visitor_uid].to_s.strip.empty?) && (properties[:guest_uid].to_s.strip.empty?)
+        if (root_params[:visitor_uid].to_s.strip.empty?) && (root_params[:guest_uid].to_s.strip.empty?)
           raise ArgumentError.new('visitor_uid or/and guest_uid must be present')
         end
-        if property_name = REQUIRED_EVENT_PROPERTIES[:general].detect{ |p| properties[p].to_s.strip.empty? }
-          raise ArgumentError.new("'#{property_name}' property must be present")
+        if invalid_root_params = root_params.keys.select{|key| !ROOT_EVENT_PROPERTIES.include?(key)}.presence
+          raise ArgumentError.new("Properties '#{invalid_root_params}' are not allowed within root event parameters")
         end
-        if REQUIRED_EVENT_PROPERTIES.has_key?(type) && property_name = REQUIRED_EVENT_PROPERTIES[type].detect{ |p| properties[p].to_s.strip.empty? }
-          raise ArgumentError.new("'#{property_name}' property must be present for '#{type}' event")
-        end
-        unless properties[:path] =~ /^\/.*/
-          raise ArgumentError.new("path must be relative, e.g.: '/' or '/foo/bar'")
+        if REQUIRED_EVENT_PROPERTIES.has_key?(type) && property_names = REQUIRED_EVENT_PROPERTIES[type].select{ |p| properties[p].to_s.strip.empty? }.presence
+          raise ArgumentError.new("'#{property_names}' property(s) must be present for '#{type}' event")
         end
       end
 
-      def send_event(type, properties, visitor_info)
-        url = "#{protocol}://#{domain}#{properties[:path]}"
+      def send_event(type, root_params, properties, visitor_info, attributes)
+        url = "#{protocol}://#{domain}#{root_params[:path]}"
         params = {
           app_key:      app_key,
           type:         type,
           domain:       domain,
           host:         domain,
           url:          url,
-          visitor_info: visitor_info
+          properties:   properties,
+          visitor_info: visitor_info,
+          attributes:   attributes
         }
-        ROOT_EVENT_PROPERTIES.each do |property_name|
-          params[property_name] = properties.delete(property_name)
-        end
-        params[:properties] = properties
 
+        params.merge!(root_params)
         connection.post('/watch/event', params)
       end
 
