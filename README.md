@@ -24,65 +24,138 @@ Options:
  
 ### Events
 
-Events can be sent using `event` method which takes 3 arguments: event type, event properties and optionally visitor properties, e.g.:
+Events can be sent using `event` method which takes 5 arguments: 
+* [required] event type
+* [required] event root parameters
+* [optional] event specific properties
+* [optional] visitor info
+* [optional] event arguments
 
-    client.event('link', {visitor_uid: '12345', path: '/foo/bar'})
-    
-    client.event('link', {visitor_uid: '12345', path: '/foo/bar'}, {first_name: 'Foo', last_name: 'Bar'})
+See examples [below](#usage-example).
     
 #### Event types
 
-| Type     | Description          |
-|----------|-----------------------|
-| link     | Visitor visited page. |
-| mailto   | Sent mail.            |
-| file     | Downloaded file.      |
-| purchase | Bought product.       |
-| view     | Viewed widget.        |
-| submit   | Submitted widget.     |
-| close    | Closed widget.        |
+| Type             | Description                |
+|------------------|----------------------------|
+| link             | Page visited.              |
+| mailto           | Email sent.                |
+| file             | File downloaded.           |
+| view_product     | Product viewed.            |
+| add_to_cart      | Product added to cart.     |
+| remove_from_cart | Product removed from cart. |
+| update_cart      | Cart updated. Will override all previous add_to_cart/remove_from_cart events in this session. |
+| purchase         | Product(s) purchased.      |
 
-#### Event properties
+#### Root event parameters
 
-| Name        | Notes                                |
-|-------------|--------------------------------------|
-| path        | Relative path of the page. Required. |
-| visitor_uid | Unique identifier of the visitor. Only [0-9a-z-] characters are allowed. visitor_uid or guest_uid is required. |
-| guest_uid   | Unique identifier of the guest visitor. Can be obtained from `convead_guest_uid` cookies. visitor_uid or guest_uid is required. |
-| title       | Title of the page.                   |
-| referrer    | Referrer url.                        |
-| key_page_id | Id of the key page to specify it manually, i.e. without using regular expression in key page form. |
+| Name        | Description                                | Default value |
+|-------------|--------------------------------------|-----|
+| domain      | [required] Convead account's domain. | Domain from initializer. |
+| host        | [required] Host of the site incl. port. | Domain from initializer. |
+| url         | [required] URL of the page. | Domain root URL. | 
+| path        | [required] Relative path of the page. | Domain root path. |
+| visitor_uid | Unique identifier of the visitor. Only [0-9a-z-] characters are allowed. visitor_uid or guest_uid is required. | |
+| guest_uid   | Unique identifier of the guest visitor. Can be obtained from `convead_guest_uid` cookie. **visitor_uid or guest_uid is required**. | |
+| title       | Title of the page.                   | |
+| referrer    | Referrer URL.                        | |
 
 #### Event specific properties
 
 ##### mailto
-| Name  | Notes     |
-|-------|-----------|
-| email | Required. |
+| Name  | Description               |
+|-------|---------------------------|
+| email | [required] Clicked email. |
 
 ##### file
-| Name     | Notes     |
-|----------|-----------|
-| file_url | Required. |
+| Name       | Description                                                        |
+|------------|--------------------------------------------------------------------|
+| file_url   | [required]                                                         |
+| file_title | File title. Shown in visitor's timeline at Convead when specified. |
+
+
+##### view_product
+| Name         | Description                                                                                             |
+|--------------|---------------------------------------------------------------------------------------------------------|
+| product_id   | [required] Your internal product id. The same as you specify in Yandex.Market/Google Merchant XML feed. |
+| product_name | Product title. If not specified, Convead will try to get it from your website's XML feed.               |
+| product_url  | Product permanent URL. If not specified, Convead will try to get it from your website's XML feed.       |
+
+##### add_to_cart
+| Name          | Description                                                                                             |
+|---------------|---------------------------------------------------------------------------------------------------------|
+| product_id    | [required] Your internal product id. The same as you specify in Yandex.Market/Google Merchant XML feed. |
+| qnt           | [required] Quantity of product items added.                                                             |
+| product_name  | Product title. If not specified, Convead will try to get it from your website's XML feed.               |
+| product_url   | Product permanent URL. If not specified, Convead will try to get it from your website's XML feed.       |
+| product_price | Product price, only numeric. If not specified, Convead will try to get it from your website's XML feed. |
+
+##### removed_from_cart
+| Name          | Description                                                                                             |
+|---------------|---------------------------------------------------------------------------------------------------------|
+| product_id    | [required] Your internal product id. The same as you specify in Yandex.Market/Google Merchant XML feed. |
+| qnt           | [required] Quantity of product items removed.                                                           |
+
+##### update_cart
+| Name          | Description                                                                                             |
+|---------------|---------------------------------------------------------------------------------------------------------|
+| items         | [required] Array of line items in cart. Each item is a JSON object: `{id: 1234, qnt: 1, price: 100.0}`. See more examples below. |
 
 ##### purchase
 | Name     | Notes       |
 |----------|-------------|
-| revenue  |             |
-| order_id | Unique identifier of the order |
-| items    | Array of products in the order, e.g. `items: [{id: 1234, qnt: 1, price: 100.0}, {...}]` |
+| revenue  | [required] Order total.            |
+| order_id | [required] Unique identifier of the order (id or number). |
+| items    | Array of order line items, e.g. `items: [{id: 1234, qnt: 1, price: 100.0}, {...}]` |
 
-##### view
-| Name      | Notes             |
-|-----------|-------------------|
-| widget_id | Id of the widget. |
+#### Visitor info
 
-##### submit
-| Name      | Notes             |
-|-----------|-------------------|
-| widget_id | Id of the widget. |
+Current visitor's parameters (if any known):
 
-##### close
-| Name      | Notes             |
-|-----------|-------------------|
-| widget_id | Id of the widget. |
+```javascript
+{
+  first_name: 'Foo',
+  last_name: 'Bar',
+  email: 'email',
+  phone: '1-111-11-11-11',
+  date_of_birth: '1984-06-16',
+  gender: 'male',
+  language: 'ru',
+  custom_field_1: 'custom value 1',
+  custom_field_2: 'custom value 2',
+  ...
+}
+```
+
+#### Usage example
+
+```ruby
+# Initialize client.
+client = Convead::Client.new('<your_app_key>', '<your_domain>', options = {})
+
+# Visitor Foo Bar has visited a /test page with title "Test page".
+client.event('link', {visitor_uid: '1', path: '/test', title: 'Test page'}, {}, {first_name: 'Foo', last_name: 'Bar'})
+
+# Visitor Foo Bar has clicked a mailto:-link with email 'test@example.net' on page /test with title "Test page".
+client.event('mailto', {visitor_uid: '1', path: '/test', title: 'Test page'}, {email: 'test@example.net'}, {first_name: 'Foo', last_name: 'Bar'})
+
+# Visitor Foo Bar has downloaded a file from http://example.net/test/file.pdf with title "File 1" from page /test with title "Test page".
+client.event('file', {visitor_uid: '1', path: '/test', title: 'Test page'}, {file_url: 'http://example.net/test/file.pdf', file_title: 'File 1'}, {first_name: 'Foo', last_name: 'Bar'})
+
+# Visitor Foo Bar has viewed a product "Product 1" with ID 1 on page /products/product-1.
+client.event('view_product', {visitor_uid: '1', path: '/products/product-1', title: 'Product 1 page'}, {product_id: 1, product_name: 'Product 1', product_url: 'http://example.net/products/product-1'}, {first_name: 'Foo', last_name: 'Bar'})
+
+# Visitor Foo Bar has added one item of "Product 1" with price 100.0 to cart.
+client.event('add_to_cart', {visitor_uid: '1', path: '/products/product-1', title: 'Product 1 page'}, {product_id: 1, qnt: 1, product_name: 'Product 1', product_url: 'http://example.net/products/product-1', price: 100.0}, {first_name: 'Foo', last_name: 'Bar'})
+
+# Visitor Foo Bar has removed one item of product with ID 1 from cart.
+client.event('remove_from_cart', {visitor_uid: '1', path: '/products/product-1', title: 'Product 1 page'}, {product_id: 1, qnt: 1}, {first_name: 'Foo', last_name: 'Bar'})
+
+# Visitor Foo Bar has emptied his cart.
+client.event('update_cart', {visitor_uid: '1', path: '/products/product-1', title: 'Product 1 page'}, {items: []}, {first_name: 'Foo', last_name: 'Bar'})
+
+# Visitor Foo Bar has updated his cart contents with two products.
+client.event('update_cart', {visitor_uid: '1', path: '/products/product-1', title: 'Product 1 page'}, {items: [{id: 1234, qnt: 1, price: 100.0}, {id: 4321, qnt: 2, price: 99.0}]}, {first_name: 'Foo', last_name: 'Bar'})
+
+# Visitor Foo Bar has purchased two products with total revenue 298.0 and order ID 123.
+client.event('purchase', {visitor_uid: '1', path: '/checkout/thank_you', title: 'Thank you!'}, {order_id: '123', revenue: '298.0', items: [{id: 1234, qnt: 1, price: 100.0}, {id: 4321, qnt: 2, price: 99.0}]}, {first_name: 'Foo', last_name: 'Bar'})
+```
