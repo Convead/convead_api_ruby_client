@@ -98,14 +98,14 @@ See examples [below](#usage-example).
 ##### update_cart
 | Name          | Description                                                                                             |
 |---------------|---------------------------------------------------------------------------------------------------------|
-| items         | [required] Array of line items in cart. Each item is a JSON object: `{id: 1234, qnt: 1, price: 100.0}`. See more examples below. |
+| items         | [required] Array of line items in cart. Each item is a JSON object: `{product_id: 1234, qnt: 1, price: 100.0}`. See more examples below. |
 
 ##### purchase
 | Name     | Notes       |
 |----------|-------------|
 | revenue  | [required] Order total.            |
 | order_id | [required] Unique identifier of the order (id or number). |
-| items    | Array of order line items, e.g. `items: [{id: 1234, qnt: 1, price: 100.0}, {...}]` |
+| items    | Array of order line items, e.g. `items: [{product_id: 1234, qnt: 1, price: 100.0}, {...}]` |
 
 #### Visitor info
 
@@ -154,8 +154,8 @@ client.event('remove_from_cart', {visitor_uid: '1', path: '/products/product-1',
 client.event('update_cart', {visitor_uid: '1', path: '/products/product-1', title: 'Product 1 page'}, {items: []}, {first_name: 'Foo', last_name: 'Bar'})
 
 # Visitor Foo Bar has updated his cart contents with two products.
-client.event('update_cart', {visitor_uid: '1', path: '/products/product-1', title: 'Product 1 page'}, {items: [{id: 1234, qnt: 1, price: 100.0}, {id: 4321, qnt: 2, price: 99.0}]}, {first_name: 'Foo', last_name: 'Bar'})
+client.event('update_cart', {visitor_uid: '1', path: '/products/product-1', title: 'Product 1 page'}, {items: [{product_id: 1234, qnt: 1, price: 100.0}, {product_id: 4321, qnt: 2, price: 99.0}]}, {first_name: 'Foo', last_name: 'Bar'})
 
 # Visitor Foo Bar has purchased two products with total revenue 298.0 and order ID 123.
-client.event('purchase', {visitor_uid: '1', path: '/checkout/thank_you', title: 'Thank you!'}, {order_id: '123', revenue: '298.0', items: [{id: 1234, qnt: 1, price: 100.0}, {id: 4321, qnt: 2, price: 99.0}]}, {first_name: 'Foo', last_name: 'Bar'})
+client.event('purchase', {visitor_uid: '1', path: '/checkout/thank_you', title: 'Thank you!'}, {order_id: '123', revenue: '298.0', items: [{product_id: 1234, qnt: 1, price: 100.0}, {product_id: 4321, qnt: 2, price: 99.0}]}, {first_name: 'Foo', last_name: 'Bar'})
 ```
