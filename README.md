@@ -45,6 +45,7 @@ See examples [below](#usage-example).
 | remove_from_cart | Product removed from cart. |
 | update_cart      | Cart updated. Will override all previous add_to_cart/remove_from_cart events in this session. |
 | purchase         | Product(s) purchased.      |
+| custom           | Custom event (must be configured in Convead account first). |
 
 #### Root event parameters
 
@@ -107,6 +108,11 @@ See examples [below](#usage-example).
 | order_id | [required] Unique identifier of the order (id or number). |
 | items    | Array of order line items, e.g. `items: [{product_id: 1234, qnt: 1, price: 100.0}, {...}]` |
 
+##### custom
+| Name     | Notes       |
+|----------|-------------|
+| key      | [required] Custom event key in Convead. |
+
 #### Visitor info
 
 Current visitor's parameters (if any known):
@@ -158,4 +164,7 @@ client.event('update_cart', {visitor_uid: '1', path: '/products/product-1', titl
 
 # Visitor Foo Bar has purchased two products with total revenue 298.0 and order ID 123.
 client.event('purchase', {visitor_uid: '1', path: '/checkout/thank_you', title: 'Thank you!'}, {order_id: '123', revenue: '298.0', items: [{product_id: 1234, qnt: 1, price: 100.0}, {product_id: 4321, qnt: 2, price: 99.0}]}, {first_name: 'Foo', last_name: 'Bar'})
+
+# Visitor performed a custom event with key 'my_custom_event'.
+client.event('custom', {visitor_uid: '29'}, {key: 'my_custom_event'})
 ```
