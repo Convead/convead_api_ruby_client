@@ -15,7 +15,7 @@ module Convead
       mailto:           [:email].freeze,
       file:             [:file_url].freeze,
       view_product:     [:product_id].freeze,
-      add_to_cart:      [:product_id, :qnt].freeze,
+      add_to_cart:      [:product_id, :qnt, :price].freeze,
       remove_from_cart: [:product_id, :qnt].freeze,
       update_cart:      [:items].freeze,
       purchase:         [:order_id, :revenue].freeze

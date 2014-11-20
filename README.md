@@ -85,9 +85,9 @@ See examples [below](#usage-example).
 |---------------|---------------------------------------------------------------------------------------------------------|
 | product_id    | [required] Your internal product id. The same as you specify in Yandex.Market/Google Merchant XML feed. |
 | qnt           | [required] Quantity of product items added.                                                             |
+| product_price | [required] Product price, only numeric. If not specified, Convead will try to get it from your website's XML feed. |
 | product_name  | Product title. If not specified, Convead will try to get it from your website's XML feed.               |
 | product_url   | Product permanent URL. If not specified, Convead will try to get it from your website's XML feed.       |
-| product_price | Product price, only numeric. If not specified, Convead will try to get it from your website's XML feed. |
 
 ##### removed_from_cart
 | Name          | Description                                                                                             |
