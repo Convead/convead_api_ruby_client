@@ -72,7 +72,7 @@ module Convead
         }
 
         params.merge!(root_params)
-        connection.post('/watch/event', params)
+        connection.post('/watch/event', {app_key: params[:app_key], visitor_uid: params[:visitor_uid], guest_uid: params[:guest_uid], data: params.to_json})
       end
 
       def protocol
