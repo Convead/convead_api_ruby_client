@@ -20,7 +20,7 @@ Create instance of the client:
     
 Options:
 
-  - `adapter` - [Faraday](https://github.com/lostisland/faraday) adapter. Default is `:net_http`
+  - `ssl` - use https instead of http
  
 ### Events
 
