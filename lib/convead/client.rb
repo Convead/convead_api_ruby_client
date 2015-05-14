@@ -1,12 +1,11 @@
 require 'uri'
-require 'faraday'
-require 'faraday_middleware'
+require 'httparty'
 require 'convead/ext'
 require 'convead/error'
-require 'convead/response/raise_error'
 
 module Convead
   class Client
+    include HTTParty
 
     API_HOST = 'tracker.convead.io'
     EVENT_TYPES = [:link, :mailto, :file, :purchase, :view_product, :add_to_cart, :remove_from_cart, :update_cart, :custom].freeze
@@ -28,7 +27,6 @@ module Convead
       @app_key = app_key
       @domain  = domain
       @options = options.symbolize_keys!
-      @options[:adapter] ||= :net_http   
     end
 
     def event(type, root_params = {}, properties = {}, visitor_info = {}, attributes = {})
@@ -72,7 +70,13 @@ module Convead
         }
 
         params.merge!(root_params)
-        connection.post('/watch/event', {app_key: params[:app_key], visitor_uid: params[:visitor_uid], guest_uid: params[:guest_uid], data: params.to_json})
+        
+        request(
+          app_key: params[:app_key], 
+          visitor_uid: params[:visitor_uid], 
+          guest_uid: params[:guest_uid], 
+          data: params.to_json
+        )
       end
 
       def protocol
@@ -83,13 +87,15 @@ module Convead
         @api_root_url ||= "#{protocol}://#{API_HOST}"
       end
 
-      def connection
-        @connection ||= Faraday.new api_root_url do |c|
-          c.use     FaradayMiddleware::EncodeJson
-          c.use     Convead::Response::RaiseError
-          c.adapter options[:adapter]
-        end
-      end
-
+    # Send POST request to API url
+    # Raise Convead::Error::APIError if responce is not OK
+    def request(params={})
+      response = self.class.post("#{api_root_url}/watch/event", body: params)
+      status = response.code
+      if status != 200
+        klass = Convead::Error::APIError.errors[status] || Convead::Error::APIError
+        raise klass.new("Server responded with status #{status}", status, response)
+      end 
+    end
   end
 end
