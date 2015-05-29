@@ -25,7 +25,7 @@ module Convead
 
     def initialize(app_key, domain, options = {})
       @app_key = app_key
-      @domain  = domain
+      @domain  = domain.downcase
       @options = options.symbolize_keys!
     end
 
