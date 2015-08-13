@@ -1,15 +1,15 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'convead/version'
+require 'convead_client/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'convead_client'
-  spec.version       = Convead::VERSION
+  spec.version       = ConveadClient::VERSION
   spec.authors       = ['Babur Usenakunov']
   spec.email         = ['hello@convead.io']
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
+  spec.description   = %q{Rich client for Convead}
+  spec.summary       = %q{Rich client for Convead}
   spec.homepage      = 'https://github.com/Convead/convead_api_ruby_client'
   spec.license       = 'MIT'
 
