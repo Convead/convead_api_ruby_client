@@ -16,7 +16,7 @@ And then execute:
 
 Create instance of the client:
 
-    client = Convead::Client.new('APP_KEY', 'DOMAIN', options = {})
+    client = ConveadClient::Client.new('APP_KEY', 'DOMAIN', options = {})
     
 Options:
 
@@ -136,7 +136,7 @@ Current visitor's parameters (if any known):
 
 ```ruby
 # Initialize client.
-client = Convead::Client.new('<your_app_key>', '<your_domain>', options = {})
+client = ConveadClient::Client.new('<your_app_key>', '<your_domain>', options = {})
 
 # Visitor Foo Bar has visited a /test page with title "Test page".
 client.event('link', {visitor_uid: '1', path: '/test', title: 'Test page'}, {}, {first_name: 'Foo', last_name: 'Bar'})
