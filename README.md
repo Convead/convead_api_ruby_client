@@ -207,10 +207,10 @@ Create instance of the api client:
 api = ConveadClient::Api.new('<your_app_key_or_account_id>')
 
 # Get visitors by segment id=333. Learn more at https://convead.io/api-doc
-api.send('segments/333/visitors')
+api.send('accounts/segments/333/visitors')
 
 # Update visitor id=99 email by 'mail@example.net'. Learn more at https://convead.io/api-doc
-api.send('visitors/99', 'PUT', {email: 'mail@example.net'})
+api.send('accounts/visitors/99', 'PUT', {email: 'mail@example.net'})
 
 # Order id=123 was deleted
 api.order_delete(123)

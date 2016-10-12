@@ -12,15 +12,15 @@ module ConveadClient
     end
 
     def order_delete(order_id)
-      send("orders/#{order_id}", 'DELETE')
+      send("accounts/orders/#{order_id}", 'DELETE')
     end
 
     def order_set_state(order_id, state='')
-      send("orders/#{order_id}", 'POST', {state: state})
+      send("accounts/orders/#{order_id}", 'POST', {state: state})
     end
 
     def send(path, method='GET', params={})
-      request_url = "#{ConveadClient.api_url}/api/v1/accounts/#{@app_key}/#{path}"
+      request_url = "#{ConveadClient.api_url}/api/v1/#{@app_key}/#{path}"
       request(request_url, method, params = {})
     end
 
