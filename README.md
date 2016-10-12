@@ -168,3 +168,53 @@ client.event('purchase', {visitor_uid: '1', path: '/checkout/thank_you', title: 
 # Visitor performed a custom event with key 'my_custom_event'.
 client.event('custom', {visitor_uid: '29'}, {key: 'my_custom_event'})
 ```
+
+## API
+
+#### Usage
+
+Create instance of the api client:
+
+    api = ConveadClient::Api.new('APP_KEY_or_ACCOUNT_ID')
+
+#### Methods
+
+##### send
+
+| Params           | Description                                                       |
+|------------------|-------------------------------------------------------------------|
+| path             | [required] Path postfix by api (more https://convead.io/api-doc). |
+| method           | The http method. Default value 'GET' .                            |
+| params           | Params for 'POST' method.                                         |
+
+##### order_delete
+
+| Params           | Description                            |
+|------------------|----------------------------------------|
+| order_id         | [required] ID order to be removed.     |
+
+##### order_set_state
+
+| Params           | Description                               |
+|------------------|-------------------------------------------|
+| order_id         | [required] ID order to be updates state.  |
+| state            | Order status to be assigned to the order. |
+
+#### Usage example
+
+```ruby
+# Initialize api client.
+api = ConveadClient::Api.new('<your_app_key_or_account_id>')
+
+# Get visitors by segment id=333. Learn more at https://convead.io/api-doc
+api.send('segments/333/visitors')
+
+# Update visitor id=99 email by 'mail@example.net'. Learn more at https://convead.io/api-doc
+api.send('visitors/99', 'PUT', {email: 'mail@example.net'})
+
+# Order id=123 was deleted
+api.order_delete(123)
+
+# Order id=123 was paid state
+api.order_set_state(123, 'paid')
+```

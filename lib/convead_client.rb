@@ -1,4 +1,5 @@
 require 'convead_client/client'
+require 'convead_client/api'
 require 'convead_client/error'
 require 'exts/hash_ext'
 
