@@ -5,6 +5,8 @@ module ConveadClient
   class Client
     include HTTParty
 
+    DEFAULT_ENDPOINT = 'https://tracker.convead.io/watch/event'.freeze
+
     attr_reader :app_key, :domain, :options
 
     def initialize(app_key, domain, options = {})
@@ -54,8 +56,12 @@ module ConveadClient
       options['ssl'] ? 'https' : 'http'
     end
 
+    def endpoint
+      options['endpoint'] || DEFAULT_ENDPOINT 
+    end
+
     def request(params={})
-      response = self.class.post("#{ConveadClient.api_url}/watch/event", body: params)
+      response = self.class.post(endpoint, body: params)
       status = response.code
       if status != 200
         raise ConveadClient::APIError.new(status, response, params)
